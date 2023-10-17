@@ -2,19 +2,27 @@ from loguru import logger
 from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.dummy import DummyClassifier
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.neighbors import KNeighborsClassifier
 import pickle
 
 
 class ModelOptimization:
+    """
+    Class for training and running cross validation on different models
+    """
     def __init__(self, random_state=None) -> None:
+        """
+        Sets a random state and StratifiedKFold
+
+        Parameters:
+        ----------
+        random_state: provides a seed for all methods that use random_state
+        """
         self.random_state = random_state
         self.skf = StratifiedKFold(
             n_splits=5, random_state=self.random_state, shuffle=True
         )
-        self.n_jobs = -1
 
     def cross_validate(self, X, y, estimator, parameters: dict) -> tuple:
         """
@@ -28,16 +36,22 @@ class ModelOptimization:
         estimator: model
         parameters: parameters used in cross validation
 
-        return: trained model, model score
+        return: trained model, model score, mean fit time, mean prediction time
         """
         gscv = GridSearchCV(estimator, parameters, cv=self.skf, verbose=3, n_jobs=7)
         gscv.fit(X, y)
         best_model = gscv.best_estimator_
         best_score = gscv.best_score_
         best_params = gscv.best_params_
+        best_params_index = gscv.cv_results_["params"].index(best_params)
+        mean_fit_time = gscv.cv_results_["mean_fit_time"][best_params_index]
+        mean_pred_time = gscv.cv_results_["mean_score_time"][best_params_index]
+
         print(f"Mean score of best estimator: {best_score}")
         print(f"With parameters: {best_params}\n")
-        return best_model, best_score
+        print(f"Mean fit time: {mean_fit_time}")
+        print(f"Mean prediction time: {mean_pred_time}")
+        return best_model, best_score, mean_fit_time, mean_pred_time
 
     def train_and_save_best_models(self, X, y) -> None:
         """
@@ -54,7 +68,6 @@ class ModelOptimization:
         models["KNN"] = self.k_neighbors(X, y)
         models["RandomForest"] = self.random_forest(X, y)
         models["MLPC"] = self.multi_layer_perceptron(X, y)
-        models["Dummy"] = self.dummy_classifier(X, y)
 
         with open("models/trained_models.pickle", "wb") as f:
             pickle.dump(models, file=f)
@@ -63,15 +76,14 @@ class ModelOptimization:
         """
         Loads trained models from file
 
-        available models:
+        Use the model name as key
 
-        Key: name
+        available models:
 
         SVC - Support Vector Classifier
         KNN - K_Nearest Neigbors Classifier
         RandomForest - Random Forest Classifier
         MLPC - Multi layer perceptron Classifier
-        Dummy - Dummy Classifier for comparison
 
         return: dictionary of models
         """
@@ -80,7 +92,7 @@ class ModelOptimization:
 
         return models
 
-    def support_vector(self, X, y) -> tuple[SVC, float]:
+    def support_vector(self, X, y) -> tuple[SVC, float, float, float]:
         """
         Estimated time on full training set: 3 hours
         """
@@ -95,9 +107,8 @@ class ModelOptimization:
         svc = SVC(random_state=self.random_state)
         return self.cross_validate(X, y, svc, parameters)
 
-    def random_forest(self, X, y):
+    def random_forest(self, X, y) -> tuple[RandomForestClassifier, float, float, float]:
         parameters = {
-            # "n_estimators": [10, 50, 100, 200],
             "criterion": ["gini", "entropy"],
             "max_features": ["sqrt", "log2"],
             "min_samples_split": [2, 6, 10],
@@ -108,7 +119,7 @@ class ModelOptimization:
         r_forest = RandomForestClassifier(random_state=self.random_state)
         return self.cross_validate(X, y, r_forest, parameters)
 
-    def k_neighbors(self, X, y):
+    def k_neighbors(self, X, y) -> tuple[KNeighborsClassifier, float, float, float]:
         parameters = {
             "n_neighbors": list(range(1, 22, 2)),
             "weights": ["uniform", "distance"],
@@ -121,7 +132,7 @@ class ModelOptimization:
 
         return self.cross_validate(X, y, knn, parameters)
 
-    def multi_layer_perceptron(self, X, y):
+    def multi_layer_perceptron(self, X, y) -> tuple[MLPClassifier, float, float, float]:
         parameters = {
             "hidden_layer_sizes": [
                 (50,),
@@ -133,8 +144,6 @@ class ModelOptimization:
                 (200, 40),
                 (300, 80),
             ],
-            # "max_iter": [500, 600, 700],
-            # "learning_rate_init": [0.001, 0.01, 0.1],
             "activation": ["tanh", "relu"],
             "alpha": [0.0001, 0.001, 0.01],
         }
@@ -143,11 +152,3 @@ class ModelOptimization:
 
         mlpc = MLPClassifier(random_state=self.random_state, max_iter=800)
         return self.cross_validate(X, y, mlpc, parameters)
-
-    def dummy_classifier(self, X, y):
-        parameters = {"strategy": ["most_frequent", "prior", "stratified", "uniform"]}
-
-        logger.info("Running parameter testing for dummy classifier")
-        dummy = DummyClassifier(random_state=self.random_state)
-
-        return self.cross_validate(X, y, dummy, parameters)
