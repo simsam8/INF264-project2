@@ -3,11 +3,25 @@ import matplotlib.pyplot as plt
 
 
 class DataExploration:
+    """
+    Class for exploring image data
+    """
     def __init__(self, features, labels) -> None:
+        """
+        Provide features and labels to explore
+
+        Parameters:
+        ----------
+        features: feature columns
+        labels: label column
+        """
         self.features = features
         self.labels = labels
 
-    def display_class_distribution(self):
+    def display_class_distribution(self) -> None:
+        """
+        Displays the class distriution for each label
+        """
         unique, counts = np.unique(self.labels, return_counts=True)
         plt.title("Class distribution")
         plt.xlabel("class label")
@@ -19,7 +33,10 @@ class DataExploration:
         plt.margins(y=0.2)
         plt.show()
 
-    def display_pixel_distribution(self):
+    def display_pixel_distribution(self) -> None:
+        """
+        Displays the pixel distribution for each pixel value
+        """
         plt.title("Pixel distribution")
         unique, counts = np.unique(self.features, return_counts=True)
         plt.bar(unique, counts)
@@ -31,13 +48,13 @@ class DataExploration:
         plt.tight_layout()
         plt.show()
 
-    def display_image(self, label=None, index=None):
+    def display_image(self, label=None, index=None) -> None:
         """
         Display a random or choosen image from the dataset.
 
         When index is choosen, ignores label.
 
-        Params:
+        Parameters:
         ----------
         label: class label integer
         index: image index (ignores label)
