@@ -6,6 +6,7 @@ class DataExploration:
     """
     Class for exploring image data
     """
+
     def __init__(self, features, labels) -> None:
         """
         Provide features and labels to explore
@@ -63,6 +64,7 @@ class DataExploration:
             plt.imshow(
                 self.features[index].reshape(20, 20), vmin=0, vmax=255, cmap="gray"
             )
+            plt.title(f"Image index: {index}")
             plt.show()
             return
 
@@ -73,4 +75,26 @@ class DataExploration:
             index = np.random.choice(self.labels.shape[0], 1, False)
 
         plt.imshow(self.features[index].reshape(20, 20), vmin=0, vmax=255, cmap="gray")
+        plt.title(f"Image index: {index}")
+        plt.show()
+
+    def display_label_prediction(
+        self, label: int, prediction: int, predictions: np.ndarray
+    ) -> None:
+        """
+        Display a random image with actual label and predicted label.
+
+        Parameters:
+        ----------
+        label: class label integer
+        prediction: prediction label integer
+        predictions: models predictions
+        """
+        different = np.where((self.labels == label) & (predictions == prediction))[0]
+        index = np.random.choice(different, 1, False)
+
+        plt.imshow(self.features[index].reshape(20, 20), vmin=0, vmax=255, cmap="gray")
+        plt.title(
+            f"Image index: {index}\nImages with same label and pred.: {len(different)}\nActual label: {label}, Prediction: {prediction}"
+        )
         plt.show()
