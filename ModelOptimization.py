@@ -4,6 +4,7 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.neighbors import KNeighborsClassifier
+from time import time
 import pickle
 
 
@@ -11,6 +12,7 @@ class ModelOptimization:
     """
     Class for training and running cross validation on different models
     """
+
     def __init__(self, random_state=None) -> None:
         """
         Sets a random state and StratifiedKFold
@@ -36,10 +38,18 @@ class ModelOptimization:
         estimator: model
         parameters: parameters used in cross validation
 
-        return: trained model, model score, mean fit time, mean prediction time
+        return: trained model,
+                model score,
+                mean fit time,
+                mean prediction time,
+                total cv time
         """
         gscv = GridSearchCV(estimator, parameters, cv=self.skf, verbose=3, n_jobs=7)
+        start_time = time()
         gscv.fit(X, y)
+        end_time = time()
+
+        total_validation_time = end_time - start_time
         best_model = gscv.best_estimator_
         best_score = gscv.best_score_
         best_params = gscv.best_params_
@@ -51,7 +61,14 @@ class ModelOptimization:
         print(f"With parameters: {best_params}\n")
         print(f"Mean fit time: {mean_fit_time}")
         print(f"Mean prediction time: {mean_pred_time}")
-        return best_model, best_score, mean_fit_time, mean_pred_time
+        print(f"Total cross validation time: {total_validation_time}")
+        return (
+            best_model,
+            best_score,
+            mean_fit_time,
+            mean_pred_time,
+            total_validation_time,
+        )
 
     def train_and_save_best_models(self, X, y) -> None:
         """
