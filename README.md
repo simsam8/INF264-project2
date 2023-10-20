@@ -19,6 +19,9 @@ python version: 3.11
 - notebook.ipynb: Jupyter notebook with the whole process
 - models/: folder with pretrained models
 - train_and_save.py: trains and saves models in models/ folder
+- requirements.txt: required packages for this project
+- report.md: markdown file used to generate pdf for final report
+- images/: images for report
 
 
 
