@@ -111,7 +111,18 @@ class ModelOptimization:
 
     def support_vector(self, X, y) -> tuple[SVC, float, float, float]:
         """
-        Estimated time on full training set: 3 hours
+        Runs cross validation on Suport Vector Machine (SVC)
+
+        Parameters:
+        ----------
+        X: features
+        y: labels
+
+        return: trained model,
+                model score,
+                mean fit time,
+                mean prediction time,
+                total cv time
         """
         parameters = {
             "kernel": ["rbf"],
@@ -125,6 +136,20 @@ class ModelOptimization:
         return self.cross_validate(X, y, svc, parameters)
 
     def random_forest(self, X, y) -> tuple[RandomForestClassifier, float, float, float]:
+        """
+        Runs cross validation on Random Forest Classifier
+
+        Parameters:
+        ----------
+        X: features
+        y: labels
+
+        return: trained model,
+                model score,
+                mean fit time,
+                mean prediction time,
+                total cv time
+        """
         parameters = {
             "criterion": ["gini", "entropy"],
             "max_features": ["sqrt", "log2"],
@@ -137,6 +162,20 @@ class ModelOptimization:
         return self.cross_validate(X, y, r_forest, parameters)
 
     def k_neighbors(self, X, y) -> tuple[KNeighborsClassifier, float, float, float]:
+        """
+        Runs cross validation on KNearest Neighbors Classifier
+
+        Parameters:
+        ----------
+        X: features
+        y: labels
+
+        return: trained model,
+                model score,
+                mean fit time,
+                mean prediction time,
+                total cv time
+        """
         parameters = {
             "n_neighbors": list(range(1, 22, 2)),
             "weights": ["uniform", "distance"],
@@ -150,6 +189,20 @@ class ModelOptimization:
         return self.cross_validate(X, y, knn, parameters)
 
     def multi_layer_perceptron(self, X, y) -> tuple[MLPClassifier, float, float, float]:
+        """
+        Runs cross validation on Multi Layer Perceptron Classifier (MLPC)
+
+        Parameters:
+        ----------
+        X: features
+        y: labels
+
+        return: trained model,
+                model score,
+                mean fit time,
+                mean prediction time,
+                total cv time
+        """
         parameters = {
             "hidden_layer_sizes": [
                 (50,),

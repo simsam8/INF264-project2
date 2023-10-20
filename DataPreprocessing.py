@@ -44,7 +44,7 @@ class DataPreprocessing:
 
     def process_data(self, data: np.ndarray) -> np.ndarray:
         """
-        applies linear scaling and color filter
+        Applies linear scaling and color filter
 
         Parameters:
         ----------
