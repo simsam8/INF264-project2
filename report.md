@@ -234,7 +234,7 @@ The gamma is the kernel coefficient.
 
 ### Time and accuracy
 
-The classifer takes 253s/4.2 minutes to classify all images in the test set.
+The classifer takes 253s/4.2 minutes to classify all images in the test set.[^1]
 For one prediction it takes around 0.01s.
 Which means the model can do 100 predictions per second.
 Unless Santas' workshop has incredibly fast conveyor belts, the chosen model 
@@ -249,6 +249,8 @@ The model has generalized to unseen data and not overfit.
 \begin{figure}[!h]
 \caption{Prediction time and accuracy comparison on final classifier}
 \end{figure}
+
+[^1]: Times will vary when run, and depends on system hardware
 
 \newpage
 
